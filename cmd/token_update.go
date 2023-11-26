@@ -6,10 +6,10 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
-	"log"
 	"net/http"
+	"os/exec"
 	"sync"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/google/go-github/v56/github"
@@ -91,11 +91,12 @@ var (
 					if err != nil {
 						cobra.CheckErr(errors.Wrap(err, "parse sheets client secret"))
 					}
-					fmt.Println("=> open this link in your browser: " + config.AuthCodeURL("state-token", oauth2.AccessTypeOffline))
-					wg.Wait()
-					log.Println("=> generated new sheets token")
 
-					fmt.Println("=> token can be updated here: " + viper.GetString("secrets_url"))
+					if err := exec.Command("xdg-open", config.AuthCodeURL("state-token", oauth2.AccessTypeOffline)).Run(); err != nil {
+						cobra.CheckErr(errors.Wrap(err, "open sheets auth url"))
+					}
+
+					wg.Wait()
 				}
 
 				if renewGmailToken {
@@ -105,9 +106,12 @@ var (
 					if err != nil {
 						cobra.CheckErr(errors.Wrap(err, "parse gmail client secret"))
 					}
-					fmt.Println("=> open this link in your browser: " + config.AuthCodeURL("state-token", oauth2.AccessTypeOffline))
+
+					if err := exec.Command("xdg-open", config.AuthCodeURL("state-token", oauth2.AccessTypeOffline)).Run(); err != nil {
+						cobra.CheckErr(errors.Wrap(err, "open gmail auth url"))
+					}
+
 					wg.Wait()
-					log.Println("=> generated new gmail token")
 				}
 
 				if err := viper.WriteConfig(); err != nil {
@@ -170,6 +174,12 @@ var (
 				)
 				if err != nil {
 					cobra.CheckErr(errors.Wrap(err, "trigger workflow run"))
+				}
+
+				time.Sleep(1 * time.Second)
+
+				if err := exec.Command("xdg-open", "https://github.com/Startup-Nights/functions/actions").Run(); err != nil {
+					cobra.CheckErr(errors.Wrap(err, "open gmail auth url"))
 				}
 			}
 		},
