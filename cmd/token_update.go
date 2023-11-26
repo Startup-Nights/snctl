@@ -29,7 +29,7 @@ var (
 	updateEnvironmentSecrets bool
 	config                   *oauth2.Config
 
-	updateCmd = &cobra.Command{
+	tokenUpdateCmd = &cobra.Command{
 		Use:   "update",
 		Short: "Renew the tokens and update them in the config file",
 		Run: func(cmd *cobra.Command, args []string) {
@@ -205,8 +205,8 @@ func encrypt(secret, pubkey string) (string, error) {
 }
 
 func init() {
-	tokenCmd.AddCommand(updateCmd)
-	updateCmd.PersistentFlags().BoolVar(&renewGmailToken, "gmail", false, "A help for foo")
-	updateCmd.PersistentFlags().BoolVar(&renewSheetsToken, "sheets", false, "A help for foo")
-	updateCmd.PersistentFlags().BoolVar(&updateEnvironmentSecrets, "update-secrets", false, "Update the github actions environment secrets")
+	tokenCmd.AddCommand(tokenUpdateCmd)
+	tokenUpdateCmd.PersistentFlags().BoolVar(&renewGmailToken, "gmail", false, "A help for foo")
+	tokenUpdateCmd.PersistentFlags().BoolVar(&renewSheetsToken, "sheets", false, "A help for foo")
+	tokenUpdateCmd.PersistentFlags().BoolVar(&updateEnvironmentSecrets, "update-secrets", false, "Update the github actions environment secrets")
 }

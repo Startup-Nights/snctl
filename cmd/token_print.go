@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-var printCmd = &cobra.Command{
+var tokenPrintCmd = &cobra.Command{
 	Use:   "print",
 	Short: "Print the currently configured tokens",
 	Run: func(cmd *cobra.Command, args []string) {
@@ -37,5 +37,5 @@ var printCmd = &cobra.Command{
 }
 
 func init() {
-	tokenCmd.AddCommand(printCmd)
+	tokenCmd.AddCommand(tokenPrintCmd)
 }
