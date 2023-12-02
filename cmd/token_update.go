@@ -176,7 +176,7 @@ var (
 					cobra.CheckErr(errors.Wrap(err, "trigger workflow run"))
 				}
 
-				time.Sleep(1 * time.Second)
+				time.Sleep(5 * time.Second)
 
 				if err := exec.Command("xdg-open", "https://github.com/Startup-Nights/functions/actions").Run(); err != nil {
 					cobra.CheckErr(errors.Wrap(err, "open gmail auth url"))
