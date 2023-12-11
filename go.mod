@@ -3,6 +3,7 @@ module github.com/startup-nights/cli
 go 1.21.1
 
 require (
+	github.com/aws/aws-sdk-go v1.48.16
 	github.com/go-chi/chi/v5 v5.0.10
 	github.com/google/go-github/v56 v56.0.0
 	github.com/pkg/errors v0.9.1
@@ -27,6 +28,7 @@ require (
 	github.com/googleapis/gax-go/v2 v2.12.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
+	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.1.0 // indirect

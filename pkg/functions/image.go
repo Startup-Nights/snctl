@@ -32,7 +32,9 @@ func Rename(timestamp int64, baseDir, imageType string) error {
 
 		filename := file.Name()
 
+		filename = strings.ToLower(filename)
 		filename = strings.ReplaceAll(filename, "-", "_")
+		filename = strings.ReplaceAll(filename, " ", "_")
 		filename = strings.ReplaceAll(filename, "ö", "oe")
 		filename = strings.ReplaceAll(filename, "ü", "ue")
 		filename = strings.ReplaceAll(filename, "ä", "ae")
@@ -106,14 +108,25 @@ func CopyFiles(timestamp int64, baseDir, targetDir string) error {
 		return err
 	}
 
+	if err := os.MkdirAll(targetDir, 0755); err != nil {
+		return err
+	}
+
 	for _, file := range files {
-		if !file.IsDir() && strings.HasPrefix(file.Name(), fmt.Sprintf("%d", timestamp)) && filepath.Ext(file.Name()) == ".png" && strings.Contains(file.Name(), "resized") {
+		if !file.IsDir() && strings.HasPrefix(file.Name(), fmt.Sprintf("%d", timestamp)) {
 			data, err := os.ReadFile(filepath.Join(baseDir, file.Name()))
 			if err != nil {
 				return err
 			}
 
-			if err := os.WriteFile(filepath.Join(targetDir, file.Name()), data, 0644); err != nil {
+			name := file.Name()
+			name = strings.ReplaceAll(name, "_resized", "")
+
+			if err := os.WriteFile(filepath.Join(targetDir, name), data, 0644); err != nil {
+				return err
+			}
+
+			if err := os.Remove(filepath.Join(baseDir, file.Name())); err != nil {
 				return err
 			}
 		}
