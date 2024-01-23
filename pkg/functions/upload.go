@@ -38,6 +38,8 @@ func Upload(cfg SpacesConfig, basedir, dir string) error {
 
 	client := s3.New(session)
 
+	fmt.Println("=> uploading to digitalocean:")
+
 	return filepath.WalkDir(basedir, func(path string, d fs.DirEntry, err error) error {
 		if d.IsDir() {
 			return nil
@@ -64,6 +66,8 @@ func upload(client *s3.S3, bucket, filename, dir string) error {
 	if err != nil {
 		return errors.Wrap(err, "upload to spaces")
 	}
+
+	fmt.Println(filepath.Join(dir, filepath.Base(filename)))
 
 	return nil
 }
