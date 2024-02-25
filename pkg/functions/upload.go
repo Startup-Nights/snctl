@@ -67,7 +67,7 @@ func upload(client *s3.S3, bucket, filename, dir string) error {
 		return errors.Wrap(err, "upload to spaces")
 	}
 
-	fmt.Println(filepath.Join(dir, filepath.Base(filename)))
+	fmt.Println("https://startupnights.fra1.digitaloceanspaces.com/" + filepath.Join(dir, filepath.Base(filename)))
 
 	return nil
 }
