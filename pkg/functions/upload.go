@@ -1,12 +1,14 @@
 package functions
 
 import (
+	"bytes"
 	"fmt"
 	"io/fs"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
+	"text/template"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -67,7 +69,36 @@ func upload(client *s3.S3, bucket, filename, dir string) error {
 		return errors.Wrap(err, "upload to spaces")
 	}
 
-	fmt.Println("https://startupnights.fra1.digitaloceanspaces.com/" + filepath.Join(dir, filepath.Base(filename)))
+	t, err := template.New("output").Parse(teamMemberTemplate)
+	if err != nil {
+		return errors.Wrap(err, "parse team member template")
+	}
+
+	url := "https://startupnights.fra1.digitaloceanspaces.com/" + filepath.Join(dir, filepath.Base(filename))
+
+	fmt.Println(url)
+
+	if strings.Contains(*object.Key, "team") {
+		var buf bytes.Buffer
+
+		if err := t.Execute(&buf, struct {
+			Name string
+			URL  string
+		}{
+			URL: url,
+		}); err != nil {
+			return errors.Wrap(err, "execute team member template")
+		}
+
+		fmt.Println(buf.String())
+	}
 
 	return nil
 }
+
+var teamMemberTemplate = `
+          - name: '{{ .Name }}'
+            position: ''
+            linkedin: ''
+            src: '{{ .URL }}'
+`
