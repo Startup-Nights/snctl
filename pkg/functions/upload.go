@@ -102,3 +102,21 @@ var teamMemberTemplate = `
             linkedin: ''
             src: '{{ .URL }}'
 `
+
+func UploadImage(client *s3.S3, bucket, filename, dir string, data []byte) (string, error) {
+	object := s3.PutObjectInput{
+		Bucket: aws.String(bucket),
+		Key:    aws.String(filepath.Join(dir, filepath.Base(filename))),
+		Body:   strings.NewReader(string(data)),
+		ACL:    aws.String("public-read"),
+	}
+
+	_, err := client.PutObject(&object)
+	if err != nil {
+		return "", errors.Wrap(err, "upload to spaces")
+	}
+
+	url := "https://startupnights.fra1.digitaloceanspaces.com/" + filepath.Join(dir, filepath.Base(filename))
+
+	return url, nil
+}

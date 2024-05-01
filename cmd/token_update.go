@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"os/exec"
+	"strings"
 	"sync"
 	"time"
 
@@ -20,10 +21,12 @@ import (
 	"golang.org/x/crypto/nacl/box"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
+	"google.golang.org/api/drive/v2"
 	"google.golang.org/api/gmail/v1"
 )
 
 var (
+	renewDriveToken          bool
 	renewGmailToken          bool
 	renewSheetsToken         bool
 	updateEnvironmentSecrets bool
@@ -33,7 +36,7 @@ var (
 		Use:   "update",
 		Short: "Renew the tokens and update them in the config file",
 		Run: func(cmd *cobra.Command, args []string) {
-			if renewGmailToken || renewSheetsToken {
+			if renewGmailToken || renewSheetsToken || renewDriveToken {
 				if !viper.IsSet("credentials") {
 					cobra.CheckErr(errors.New("no sheets token file configured"))
 				}
@@ -64,6 +67,10 @@ var (
 						_, _ = w.Write([]byte("failed to encode token to json: " + err.Error()))
 					}
 
+					if strings.Contains(scope, "drive") {
+						scope = "drive"
+					}
+
 					switch scope {
 					case "https://www.googleapis.com/auth/gmail.compose":
 						viper.Set("gmail_token", buf.String())
@@ -72,6 +79,10 @@ var (
 					case "https://www.googleapis.com/auth/spreadsheets":
 						viper.Set("sheets_token", buf.String())
 						_, _ = w.Write([]byte("updated sheets token"))
+
+					case "drive":
+						viper.Set("drive_token", buf.String())
+						_, _ = w.Write([]byte("updated drive token"))
 
 					default:
 						_, _ = w.Write([]byte("unknown scope: " + scope))
@@ -109,6 +120,26 @@ var (
 
 					if err := exec.Command("xdg-open", config.AuthCodeURL("state-token", oauth2.AccessTypeOffline)).Run(); err != nil {
 						cobra.CheckErr(errors.Wrap(err, "open gmail auth url"))
+					}
+
+					wg.Wait()
+				}
+
+				if renewDriveToken {
+					var err error
+					wg.Add(1)
+					config, err = google.ConfigFromJSON(b,
+						drive.DriveScope,
+						drive.DriveFileScope,
+						drive.DriveMetadataScope,
+						drive.DrivePhotosReadonlyScope,
+					)
+					if err != nil {
+						cobra.CheckErr(errors.Wrap(err, "parse drive client secret"))
+					}
+
+					if err := exec.Command("xdg-open", config.AuthCodeURL("state-token", oauth2.AccessTypeOffline)).Run(); err != nil {
+						cobra.CheckErr(errors.Wrap(err, "open drive auth url"))
 					}
 
 					wg.Wait()
@@ -216,7 +247,8 @@ func encrypt(secret, pubkey string) (string, error) {
 
 func init() {
 	tokenCmd.AddCommand(tokenUpdateCmd)
-	tokenUpdateCmd.PersistentFlags().BoolVar(&renewGmailToken, "gmail", false, "A help for foo")
-	tokenUpdateCmd.PersistentFlags().BoolVar(&renewSheetsToken, "sheets", false, "A help for foo")
+	tokenUpdateCmd.PersistentFlags().BoolVar(&renewGmailToken, "gmail", false, "Update the gmail token")
+	tokenUpdateCmd.PersistentFlags().BoolVar(&renewSheetsToken, "sheets", false, "Update the sheets token")
+	tokenUpdateCmd.PersistentFlags().BoolVar(&renewDriveToken, "drive", false, "Update the drive token")
 	tokenUpdateCmd.PersistentFlags().BoolVar(&updateEnvironmentSecrets, "update-secrets", false, "Update the github actions environment secrets")
 }

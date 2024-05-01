@@ -241,3 +241,63 @@ func resizeImage(filename string, targetWidth, targetHeight int) error {
 
 	return os.WriteFile(strings.ReplaceAll(filename, filepath.Ext(filename), fmt.Sprintf("_resized%s", filepath.Ext(filename))), output.Bytes(), 0644)
 }
+
+func SimplifyName(filename string) string {
+	filename = strings.ToLower(filename)
+	filename = strings.ReplaceAll(filename, "-", "_")
+	filename = strings.ReplaceAll(filename, " ", "_")
+	filename = strings.ReplaceAll(filename, "ö", "oe")
+	filename = strings.ReplaceAll(filename, "ü", "ue")
+	filename = strings.ReplaceAll(filename, "ä", "ae")
+
+	return filename
+}
+
+func ResizeImage(data []byte, filename string, targetWidth, targetHeight int) ([]byte, error) {
+	var (
+		output bytes.Buffer
+		src    image.Image
+		err    error
+	)
+
+	buf := bytes.NewBuffer(data)
+
+	switch filepath.Ext(filename) {
+	case ".png":
+		src, err = png.Decode(buf)
+
+	case ".jpg":
+		fallthrough
+	case ".jpeg":
+		src, err = jpeg.Decode(buf)
+
+	default:
+		log.Println("filetype currently not supported, skipping " + filename)
+		return []byte{}, nil
+	}
+
+	if err != nil {
+		return []byte{}, err
+	}
+
+	x := float64(src.Bounds().Max.X)
+	y := float64(src.Bounds().Max.Y)
+
+	factorX := x / float64(targetWidth)
+	factorY := y / float64(targetHeight)
+
+	var dst *image.RGBA
+
+	if factorX > factorY {
+		dst = image.NewRGBA(image.Rect(0, 0, targetWidth, int(y/factorX)))
+	} else {
+		dst = image.NewRGBA(image.Rect(0, 0, int(x/factorY), targetHeight))
+	}
+
+	draw.NearestNeighbor.Scale(dst, dst.Rect, src, src.Bounds(), draw.Over, nil)
+	if err := png.Encode(&output, dst); err != nil {
+		return []byte{}, err
+	}
+
+	return output.Bytes(), nil
+}
