@@ -21,8 +21,6 @@ import (
 )
 
 var (
-	csvFile string
-
 	teamCmd = &cobra.Command{
 		Use:   "team",
 		Short: "Upload team members from csv file",
@@ -149,7 +147,6 @@ var (
 
 func init() {
 	uploadCmd.AddCommand(teamCmd)
-	uploadCmd.PersistentFlags().StringVar(&csvFile, "csv", "", "Path to the csv file with the team member changes")
 }
 
 var teamMemberTemplate = `

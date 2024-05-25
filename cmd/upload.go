@@ -10,6 +10,8 @@ import (
 )
 
 var (
+	csvFile string
+
 	baseDir      string
 	targetDir    string
 	targetWidth  int
@@ -64,4 +66,6 @@ func init() {
 	uploadCmd.PersistentFlags().StringVar(&imageType, "type", "partner", "Type of image aka partner / speaker / team")
 	uploadCmd.PersistentFlags().IntVar(&targetWidth, "width", 600, "Width to scale the image to")
 	uploadCmd.PersistentFlags().IntVar(&targetHeight, "height", 300, "Height to scale the image to")
+
+	uploadCmd.PersistentFlags().StringVar(&csvFile, "csv", "", "Path to the csv file with the team member changes")
 }
