@@ -103,7 +103,7 @@ var (
 						cobra.CheckErr(errors.Wrap(err, "parse sheets client secret"))
 					}
 
-					if err := exec.Command("xdg-open", config.AuthCodeURL("state-token", oauth2.AccessTypeOffline)).Run(); err != nil {
+					if err := exec.Command("xdg-open", config.AuthCodeURL("state-token", oauth2.AccessTypeOffline)).Start(); err != nil {
 						cobra.CheckErr(errors.Wrap(err, "open sheets auth url"))
 					}
 
@@ -118,7 +118,7 @@ var (
 						cobra.CheckErr(errors.Wrap(err, "parse gmail client secret"))
 					}
 
-					if err := exec.Command("xdg-open", config.AuthCodeURL("state-token", oauth2.AccessTypeOffline)).Run(); err != nil {
+					if err := exec.Command("xdg-open", config.AuthCodeURL("state-token", oauth2.AccessTypeOffline)).Start(); err != nil {
 						cobra.CheckErr(errors.Wrap(err, "open gmail auth url"))
 					}
 
@@ -138,7 +138,7 @@ var (
 						cobra.CheckErr(errors.Wrap(err, "parse drive client secret"))
 					}
 
-					if err := exec.Command("xdg-open", config.AuthCodeURL("state-token", oauth2.AccessTypeOffline)).Run(); err != nil {
+					if err := exec.Command("xdg-open", config.AuthCodeURL("state-token", oauth2.AccessTypeOffline)).Start(); err != nil {
 						cobra.CheckErr(errors.Wrap(err, "open drive auth url"))
 					}
 
@@ -209,9 +209,11 @@ var (
 
 				time.Sleep(5 * time.Second)
 
-				if err := exec.Command("xdg-open", "https://github.com/Startup-Nights/functions/actions").Run(); err != nil {
+				if err := exec.Command("xdg-open", "https://github.com/Startup-Nights/functions/actions").Start(); err != nil {
 					cobra.CheckErr(errors.Wrap(err, "open gmail auth url"))
 				}
+
+				time.Sleep(5 * time.Second)
 			}
 		},
 	}
