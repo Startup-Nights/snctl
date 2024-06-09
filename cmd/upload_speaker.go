@@ -4,13 +4,13 @@ import (
 	"bytes"
 	"encoding/csv"
 	"fmt"
-	"html/template"
 	"io"
 	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"text/template"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -30,16 +30,19 @@ var (
 		Run: func(cmd *cobra.Command, args []string) {
 			data, err := os.ReadFile(csvFile)
 			if err != nil {
+				log.Printf("readfile: %v", err)
 				log.Fatal(err)
 			}
 
 			records, err := csv.NewReader(bytes.NewBuffer(data)).ReadAll()
 			if err != nil {
+				log.Printf("read csv: %v", err)
 				log.Fatal(err)
 			}
 
 			t, err := template.New("output").Parse(speakerTemplate)
 			if err != nil {
+				log.Printf("parse template: %v", err)
 				log.Fatal(err)
 			}
 
@@ -72,6 +75,7 @@ var (
 
 			session, err := session.NewSession(config)
 			if err != nil {
+				log.Printf("create new session: %v", err)
 				log.Fatal(err)
 			}
 
@@ -83,10 +87,12 @@ var (
 				googleapi.QueryParameter("includeItemsFromAllDrives", "True"),
 			)
 			if err != nil {
+				log.Printf("list files: %v", err)
 				log.Fatal(err)
 			}
 			if len(files.Files) == 0 {
 				log.Fatal("no images found in drive folder")
+				return
 			}
 
 			for i, record := range records {
@@ -134,15 +140,18 @@ var (
 				output := filepath.Join(os.TempDir(), "output.png")
 
 				if err := os.WriteFile(input, data, 0644); err != nil {
+					log.Printf("write file: %v", err)
 					log.Fatal(err)
 				}
 
 				if err := exec.Command("convert", input, output).Run(); err != nil {
+					log.Printf("convert: %v", err)
 					log.Fatal(err)
 				}
 
 				data, err = os.ReadFile(output)
 				if err != nil {
+					log.Printf("readfile: %v", err)
 					log.Fatal(err)
 				}
 
@@ -182,6 +191,7 @@ var (
 			}{
 				Speakers: speakers,
 			}); err != nil {
+				log.Printf("template: %v", err)
 				log.Fatal(err)
 			}
 
@@ -198,7 +208,8 @@ var speakerTemplate = `
 {{ range .Speakers }}
       - name: '{{ .Name }}'
         position: '{{ .Position }}'
-        description: '{{ .Description }}'
+        description: >-
+	  {{ .Description }}
         image:
           src: '{{ .Image }}'
           alt: '{{ .Name }}'{{ end }}
