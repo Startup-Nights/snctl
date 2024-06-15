@@ -1,6 +1,6 @@
 package main
 
-import "github.com/startup-nights/cli/cmd"
+import "github.com/startup-nights/snctl/cmd"
 
 func main() {
 	cmd.Execute()

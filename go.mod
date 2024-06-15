@@ -1,4 +1,4 @@
-module github.com/startup-nights/cli
+module github.com/startup-nights/snctl
 
 go 1.21.1
 

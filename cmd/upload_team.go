@@ -16,7 +16,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/startup-nights/cli/pkg/functions"
+	"github.com/startup-nights/snctl/pkg/functions"
 	"google.golang.org/api/googleapi"
 )
 
