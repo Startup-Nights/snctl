@@ -1,7 +1,11 @@
 # snctl
 
 A tool to automate maintenance / content tasks around the startup nights 
-website.
+website. See `snctl --help` for more information.
+
+```sh
+snctl token update --drive --gmail --sheets --update-secrets
+```
 
 ## Notes
 
