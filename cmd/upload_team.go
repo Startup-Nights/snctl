@@ -24,6 +24,8 @@ var (
 	teamCmd = &cobra.Command{
 		Use:   "team",
 		Short: "Upload team members from csv file",
+		Long: `Skips the first two rows automatically. Only prints team members with complete
+information (for example, if someone should be deleted, this does not pop up).`,
 		Run: func(cmd *cobra.Command, args []string) {
 			data, err := os.ReadFile(csvFile)
 			if err != nil {
