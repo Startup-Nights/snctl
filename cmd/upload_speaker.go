@@ -179,7 +179,7 @@ var (
 				speakers = append(speakers, speaker{
 					Name:        record[0],
 					Position:    record[10],
-					Description: record[24],
+					Description: record[26],
 					Image:       url,
 				})
 			}
@@ -206,11 +206,11 @@ func init() {
 
 var speakerTemplate = `
 {{ range .Speakers }}
-      - name: '{{ .Name }}'
-        position: '{{ .Position }}'
-        description: >-
-	  {{ .Description }}
-        image:
-          src: '{{ .Image }}'
-          alt: '{{ .Name }}'{{ end }}
+            - name: '{{ .Name }}'
+              position: '{{ .Position }}'
+              description: >-
+                {{ .Description }}
+              image:
+                src: '{{ .Image }}'
+                alt: '{{ .Name }}'{{ end }}
 `
