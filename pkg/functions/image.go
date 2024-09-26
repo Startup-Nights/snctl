@@ -244,6 +244,7 @@ func resizeImage(filename string, targetWidth, targetHeight int) error {
 
 func SimplifyName(filename string) string {
 	filename = strings.ToLower(filename)
+	filename = strings.ReplaceAll(filename, ".", "")
 	filename = strings.ReplaceAll(filename, "-", "_")
 	filename = strings.ReplaceAll(filename, " ", "_")
 	filename = strings.ReplaceAll(filename, "ö", "oe")
